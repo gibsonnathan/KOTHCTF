@@ -6,7 +6,6 @@ from flask import Flask, render_template, request, Response, jsonify, flash, red
 # from flask.ext.sqlalchemy import SQLAlchemy
 import logging
 from logging import Formatter, FileHandler
-from forms import *
 import os
 import SimpleHTTPServer
 import SocketServer
@@ -26,17 +25,20 @@ class Machine():
         self.flags = {}
         self.socket = socket
         
-    def add_flag(flag):
-        if flag in flag_count:
+    def add_flag(self, flag):
+        if flag in self.flags:
             flag_count[flag] += 1
         else:
-            flag_count[flag] = 1
+            flags[flag] = 1
             
-    def flag_count(flag):
-        if flag in flags:
-            return flags[flag]
+    def flag_count(self, flag):
+        if flag in self.flags:
+            return self.flags[flag]
         else:
             return 0
+        
+    def __str__(self):
+        return self.name + ' ' + str(self.flags)
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -64,30 +66,27 @@ clients = []
 def listenForClient():
      while 1:
         clientsock, addr = serversock.accept()
-        #build machine object
-        clients.append(clientsock)
+        name = clientsock.recv(1024)
+        print 'receiving name ' + name
+        m = Machine(name, clientsock)
+        clients.append(m)
         t = threading.Thread(target=listenToClient, args=(clientsock, addr))
         t.deamon = True
         t.start()
         
-'''
-    protocol that the clients send:
-    machine-flag
-'''
-def listenToClient(client, address):
-        size = 1024
+def listenToClient(client, addr):
         while True:
             try:
-                data = client.recv(size)
+                data = client.recv(1024)
+                print 'receiving flag ' + data
                 if data:
-                    machine = data.split('-')[0]
+                    name = data.split('-')[0]
                     flag = data.split('-')[1]
-                    print machine 
-                    print flag
+                    filter(lambda x : x.name == name, clients)[0].add_flag(flag)
                 else:
                     raise error('Client disconnected')
             except:
-                clients.remove(client)
+                clients.remove(filter(lambda x: x.socket == client, clients)[0])
                 client.close()
                 return False
 
@@ -98,16 +97,6 @@ def listenToClient(client, address):
 @app.route('/')
 def home():
     return render_template('clients.html', data = clients)
-
-@app.route('/signup', methods=['POST', 'GET'])
-def signup():
-    if request.method == 'POST':
-        email = request.form['name']
-        password = request.form['pass']
-        flag = request.form['flag']
-        return redirect(url_for('home'))
-    else:
-        return render_template('signup.html')
 
 #----------------------------------------------------------------------------#
 # Launch.
