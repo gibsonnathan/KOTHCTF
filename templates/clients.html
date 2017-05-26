@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block body %}
+<h3>connected clients</h3>
+
+{% for client in data %}
+    <li>{{ client }}</li>
+{% endfor %}
+
+{% endblock %}
