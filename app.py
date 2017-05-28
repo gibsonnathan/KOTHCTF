@@ -3,10 +3,7 @@
 #----------------------------------------------------------------------------#
 
 from flask import Flask, render_template, request, Response, jsonify, flash, redirect, url_for
-import logging
-from logging import Formatter, FileHandler
 import os
-import SimpleHTTPServer
 import SocketServer
 import threading
 from socket import *
@@ -48,7 +45,7 @@ app = Flask(__name__)
 CORS(app)
 app.config.from_object('config')
 app.config['SECRET_KEY'] = 'secret!'
-DEBUGGING = True
+DEBUGGING = False
 
 #----------------------------------------------------------------------------#
 # Server

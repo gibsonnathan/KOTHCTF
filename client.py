@@ -2,7 +2,8 @@ import atexit
 import socket
 import time
 
-DEBUGGING = True
+DEBUGGING = False
+TIME_INTERVAL = 5
 
 def exit_handler(sock):
     if DEBUGGING:
@@ -29,6 +30,6 @@ while(True):
     sock.send(name + '-' + flag)
     if DEBUGGING:
         print 'sending flag ' + flag
-    time.sleep(5)
+    time.sleep(TIME_INTERVAL)
     
 
