@@ -3,7 +3,6 @@
 #----------------------------------------------------------------------------#
 
 from flask import Flask, render_template, request, Response, jsonify, flash, redirect, url_for
-# from flask.ext.sqlalchemy import SQLAlchemy
 import logging
 from logging import Formatter, FileHandler
 import os
@@ -27,9 +26,9 @@ class Machine():
         
     def add_flag(self, flag):
         if flag in self.flags:
-            flag_count[flag] += 1
+            self.flags[flag] += 1
         else:
-            flags[flag] = 1
+            self.flags[flag] = 1
             
     def flag_count(self, flag):
         if flag in self.flags:
@@ -48,7 +47,7 @@ app = Flask(__name__)
 CORS(app)
 app.config.from_object('config')
 app.config['SECRET_KEY'] = 'secret!'
-#db = SQLAlchemy(app)
+DEBUGGING = True
 
 #----------------------------------------------------------------------------#
 # Server
@@ -67,28 +66,31 @@ def listenForClient():
      while 1:
         clientsock, addr = serversock.accept()
         name = clientsock.recv(1024)
-        print 'receiving name ' + name
+        if DEBUGGING:
+            print 'connection received from ' + name
         m = Machine(name, clientsock)
         clients.append(m)
-        t = threading.Thread(target=listenToClient, args=(clientsock, addr))
+        t = threading.Thread(target=listenToClient, args=(m,))
         t.deamon = True
         t.start()
         
-def listenToClient(client, addr):
-        while True:
-            try:
-                data = client.recv(1024)
-                print 'receiving flag ' + data
-                if data:
-                    name = data.split('-')[0]
-                    flag = data.split('-')[1]
-                    filter(lambda x : x.name == name, clients)[0].add_flag(flag)
-                else:
-                    raise error('Client disconnected')
-            except:
-                clients.remove(filter(lambda x: x.socket == client, clients)[0])
-                client.close()
-                return False
+def listenToClient(m):
+    listening = True
+    while listening:
+        data = m.socket.recv(1024)
+        if DEBUGGING:
+            print 'client sent ' + data
+        if 'quit' in data:
+            close = 1
+            clients.remove(m)
+            m.socket.close()
+            listening = False            
+        else:
+            name = data.split('-')[0]
+            flag = data.split('-')[1]
+            m.add_flag(flag)
+            
+                    
 
 #----------------------------------------------------------------------------#
 # Controllers.
