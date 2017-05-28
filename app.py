@@ -14,6 +14,9 @@ from flask_cors import CORS, cross_origin
 #----------------------------------------------------------------------------#
 # Models
 #----------------------------------------------------------------------------#
+'''
+    represents a connected client
+'''
 class Machine():
     
     def __init__(self, name, socket):
@@ -60,6 +63,10 @@ serversock.bind(ADDR)
 serversock.listen(5)
 clients = []
 
+'''
+    listens for a client to connect and starts a thread to handle subsequent client
+    interactions 
+'''
 def listenForClient():
      while 1:
         clientsock, addr = serversock.accept()
@@ -71,7 +78,11 @@ def listenForClient():
         t = threading.Thread(target=listenToClient, args=(m,))
         t.deamon = True
         t.start()
-        
+    
+'''
+    handles communication between the server and a client, listens for updates from 
+    the client which consist of a machine-flag message or a disconnect message
+'''
 def listenToClient(m):
     listening = True
     while listening:
@@ -87,21 +98,24 @@ def listenToClient(m):
             name = data.split('-')[0]
             flag = data.split('-')[1]
             m.add_flag(flag)
-            
-                    
-
+        
 #----------------------------------------------------------------------------#
 # Controllers.
 #----------------------------------------------------------------------------#
-
+'''
+    shows all of the currently connected clients
+'''
 @app.route('/')
 def home():
     return render_template('clients.html', data = clients)
 
-
+'''
+    shows the current scores on all clients
+'''
 @app.route('/scoreboard')
 def scoreboard():
     l = []
+    print clients
     for client in clients:
         l.append({'name' : client.name, 'flags' : client.flags})
         
