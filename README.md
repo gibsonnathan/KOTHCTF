@@ -19,10 +19,10 @@ the more the server will increase your score.
 
 # How to use
 
-1.) install dependencies
-2.) python app.py
-3.) put client.py on each scored machine and run python client.py
-4.) /scoreboard displays the each flag that has been placed on the server along with how many times that flag was scored.
+- 1.) install dependencies
+- 2.) python app.py
+- 3.) put client.py on each scored machine and run python client.py
+- 4.) /scoreboard displays the each flag that has been placed on the server along with how many times that flag was scored.
 
 # TODO
 
