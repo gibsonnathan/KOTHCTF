@@ -9,7 +9,7 @@ The idea is a King of the Hill capture the flag scoring engine.
 Admin:
 
 An administrator sets up vulnerable machines by running the client program and designating where the flag file is located on the machine. 
-The client program periodically sends the flag contained in the flag file to the server. Scores can be viewed on / route of the web server.
+The client program periodically sends the flag contained in the flag file to the server. Scores can be viewed on /scoreboard route of the web server.
 
 
 Player:
@@ -21,7 +21,7 @@ the more the server will increase your score.
 
 - 1.) install dependencies
 - 2.) python app.py
-- 3.) put client.py on each scored machine and run python client.py
+- 3.) put client.py on each scored machine and run python client.py, follow prompts
 - 4.) /scoreboard displays the each flag that has been placed on the server along with how many times that flag was scored.
 
 # TODO
