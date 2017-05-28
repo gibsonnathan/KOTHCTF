@@ -23,6 +23,7 @@ class Machine():
         self.name = name
         self.flags = {}
         self.socket = socket
+        self.alive = True
         
     def add_flag(self, flag):
         if flag in self.flags:
@@ -82,7 +83,7 @@ def listenToClient(m):
             print 'client sent ' + data
         if 'quit' in data:
             close = 1
-            clients.remove(m)
+            m.alive = False
             m.socket.close()
             listening = False            
         else:
@@ -99,6 +100,20 @@ def listenToClient(m):
 @app.route('/')
 def home():
     return render_template('clients.html', data = clients)
+
+
+@app.route('/scoreboard')
+def scoreboard():
+    l = []
+    for client in clients:
+        l.append({'name' : client.name, 'flags' : client.flags})
+        
+    response = app.response_class(
+        response=json.dumps(l),
+        status=200,
+        mimetype='application/json'
+    )
+    return response
 
 #----------------------------------------------------------------------------#
 # Launch.

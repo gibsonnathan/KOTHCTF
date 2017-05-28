@@ -3,9 +3,9 @@
 <h3>connected clients: </h3>
 <ul>
 {% for client in data %}
-    <li><h3>{{ client.name }}</h3></li>
-    {{ client.flags }}
+    {% if client.alive %}
+        <li><h3>{{ client.name }}</h3></li>
+    {% endif %}
 {% endfor %}
 </ul>
-
 {% endblock %}
